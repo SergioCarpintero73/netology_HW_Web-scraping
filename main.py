@@ -3,6 +3,7 @@ import bs4
 
 base_url = 'https://habr.com'
 
+
 def get_list_articles():
     HEADERS = {
         'Cookie': '_ym_uid=1639148487334283574; _ym_d=1639149414; _ga=GA1.2.528119004.1639149415; '
@@ -16,7 +17,7 @@ def get_list_articles():
         'Cache-Control': 'max-age=0',
         'If-None-Match': 'W/"37433-+qZyNZhUgblOQJvD5vdmtE4BN6w"',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                    'Chrome/96.0.4664.93 Safari/537.36',
+                      'Chrome/96.0.4664.93 Safari/537.36',
         'sec-ch-ua-mobile': '?0'
     }
 
@@ -30,19 +31,27 @@ def get_list_articles():
     articles = soup.find_all('article')
     return articles
 
+
+def search_word_in(keys, words):
+    for key in keys:
+        key = key.lower()
+        if key in words:
+            return words
+
+
 def get_list_posts_from_preview(articles, keys):
     for article in articles:
-        hubs = article.find_all(class_='tm-article-snippet__hubs-item')
-        hubs = [hub.text.strip() for hub in hubs]
+        hubs = article.find(class_='tm-article-snippet__hubs-item')
+        posts = article.find('p')
+        search_word_in(keys, hubs and posts)
+        date = article.find('time').get('title')
+        title = article.find('h2').find('span').text
+        href = article.find('a', class_="tm-article-snippet__title-link").get('href')
+        link = base_url + href
+        print(f'{date[0:10]}  -  {title} - {link}')
+        break
 
-        for hub in hubs:
-            if hub in keys:
-                date = article.find('time').get('title')
-                title = article.find('h2').find('span').text
-                href = article.find('a', class_="tm-article-snippet__title-link").get('href')
-                link = base_url + href
-                print(f'{date[0:10]}  -  {title} - {link}')
 
 if __name__ == '__main__':
-    KEYWORDS = ['дизайн', 'фото', 'Карьера в IT-индустрии', 'python', 'Информационная безопасность', 'PostgreSQL']
+    KEYWORDS = ['дизайн', 'фото', 'Карьера в IT-индустрии', 'python']
     get_list_posts_from_preview(get_list_articles(), KEYWORDS)
