@@ -32,25 +32,20 @@ def get_list_articles():
     return articles
 
 
-def search_word_in(keys, words):
-    for key in keys:
-        key = key.lower()
-        if key in words:
-            return words
-
-
 def get_list_posts_from_preview(articles, keys):
     for article in articles:
-        hubs = article.find(class_='tm-article-snippet__hubs-item')
-        posts = article.find('p')
-        search_word_in(keys, hubs and posts)
+        hubs = article.find_all(class_='tm-article-snippet__hubs-item')
+        hubs = [hub.text.strip() for hub in hubs]
+        posts = article.find_all('p', class_="article-formatted-body article-formatted-body_version-2")
         date = article.find('time').get('title')
         title = article.find('h2').find('span').text
         href = article.find('a', class_="tm-article-snippet__title-link").get('href')
         link = base_url + href
-        print(f'{date[0:10]}  -  {title} - {link}')
+        for key in keys:
+            if key in hubs or key in posts:
+                print(f'{date[0:10]}  -  {title} - {link}')
 
 
 if __name__ == '__main__':
-    KEYWORDS = ['дизайн', 'фото', 'Карьера в IT-индустрии', 'python']
+    KEYWORDS = ['дизайн', 'фото', 'Карьера в IT-индустрии', 'python', 'Хостинг']
     get_list_posts_from_preview(get_list_articles(), KEYWORDS)
