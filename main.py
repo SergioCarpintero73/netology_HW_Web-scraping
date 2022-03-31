@@ -49,7 +49,6 @@ def get_list_posts_from_preview(articles, keys):
         href = article.find('a', class_="tm-article-snippet__title-link").get('href')
         link = base_url + href
         print(f'{date[0:10]}  -  {title} - {link}')
-        break
 
 
 if __name__ == '__main__':
